@@ -1,4 +1,6 @@
-#  Minimal Cape
+#  Minimal Cape, No USer LEDs
+
+This cape configuration is intended for use where some other part of the gateware will use the LEDs.
 
 ## P8 Header
 
@@ -6,18 +8,18 @@
 |--------|----------------------------|-------------|
 | P8_1   | n/a                        | GND         |
 | P8_2   | n/a                        | GND         |
-| P8_3   | MSS GPIO_2[0]              | User LED 0  |
-| P8_4   | MSS GPIO_2[1]              | User LED 1  |
-| P8_5   | MSS GPIO_2[2]              | User LED 2  |
-| P8_6   | MSS GPIO_2[3]              | User LED 3  |
-| P8_7   | MSS GPIO_2[4]              | User LED 4  |
-| P8_8   | MSS GPIO_2[5]              | User LED 5  |
-| P8_9   | MSS GPIO_2[6]              | User LED 6  |
-| P8_10  | MSS GPIO_2[7]              | User LED 7  |
-| P8_11  | MSS GPIO_2[8]              | User LED 8  |
-| P8_12  | MSS GPIO_2[9]              | User LED 9  |
-| P8_13  | MSS GPIO_2[10]             | User LED 10 |
-| P8_14  | MSS GPIO_2[11]             | User LED 11 |
+| P8_3   | n/a                        | NC          |
+| P8_4   | n/a                        | NC          |
+| P8_5   | n/a                        | NC          |
+| P8_6   | n/a                        | NC          |
+| P8_7   | n/a                        | NC          |
+| P8_8   | n/a                        | NC          |
+| P8_9   | n/a                        | NC          |
+| P8_10  | n/a                        | NC          |
+| P8_11  | n/a                        | NC          |
+| P8_12  | n/a                        | NC          |
+| P8_13  | n/a                        | NC          |
+| P8_14  | n/a                        | NC          |
 | P8_15  | n/a                        | NC          |
 | P8_16  | n/a                        | NC          |
 | P8_17  | n/a                        | NC          |

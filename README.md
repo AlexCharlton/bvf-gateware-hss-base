@@ -1,4 +1,4 @@
-# MPFS Gateware & HSS Base
+# BeagleV-Fire Gateware & HSS Base
 
 ## Usage
 Clone this repository, with submodules:

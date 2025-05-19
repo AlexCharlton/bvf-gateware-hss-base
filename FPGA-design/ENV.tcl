@@ -59,9 +59,9 @@ set project_name "BVF_GATEWARE_025T"
 #set top_level_name BVF_GATEWARE
 
 if {[info exists PROG_EXPORT_PATH]} {
-    set prog_export_path $PROG_EXPORT_PATH/bitstream
+    set prog_export_path $PROG_EXPORT_PATH
 } else {
-    set prog_export_path $local_dir/bitstream
+    error "PROG_EXPORT_PATH is not set"
 }
 
 set fpe_export_path $prog_export_path/FlashProExpress

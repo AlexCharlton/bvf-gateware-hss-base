@@ -14,8 +14,13 @@ SYNTHESIZE_ONLY=0
 PROGRAM_ONLY=0
 SYNTHESIS_ERRORS=0
 FULL_SYNTHESIS_LOG=0
+PLACE_AND_ROUTE_LOG=0
 
 DEFAULT_BOARD=mpfs-beaglev-fire
+DEVICE=MPFS025T
+
+# Add at the start of the script, after the shebang and set -e:
+START_TIME=$(date +%s)
 
 usage() {
     echo "Usage: $0 GATEWARE-DIR [BOARD] [options]"
@@ -26,6 +31,7 @@ usage() {
     echo "  -s, --synthesize-only     Only synthesize the design, skip the build"
     echo "  -e, --synthesis-errors    Show synthesis errors from a previous build"
     echo "  -l, --full-synthesis-log  Show the full synthesis log"
+    echo "  -r, --pnr-log             Show the place and route log"
     echo "  --program-only            Program the device only, skip the build"
 }
 
@@ -86,6 +92,7 @@ make_mss_config() {
     mkdir -p "$output_dir"
 
     pfsoc_mss -GENERATE -CONFIGURATION_FILE:$config_file -OUTPUT_DIR:$output_dir
+    echo "MSS configuration generated"
 }
 
 build_hss() {
@@ -160,7 +167,34 @@ generate_libero_project() {
     local hss_path=$(correct_path "$HSS_IMAGE_PATH")
     local prog_path=$(correct_path "$BUILD_DIR")
 
-    command="libero SCRIPT:BUILD_BVF_GATEWARE.tcl \"SCRIPT_ARGS: CAPE_DIR:$cape_dir PROJECT_LOCATION:$project_dir TOP_LEVEL_NAME:$TOP_LEVEL_NAME HSS_IMAGE_PATH:$hss_path PROG_EXPORT_PATH:$prog_path DESIGN_VERSION:$DESIGN_VERSION\""
+    only_do=""
+    if [ $CREATE_ONLY -eq 1 ]; then
+        only_do=" ONLY_CREATE_DESIGN:1"
+    elif [ $SYNTHESIZE_ONLY -eq 1 ]; then
+        only_do=" ONLY_SYNTHESIZE:1"
+    fi
+
+    command="libero SCRIPT:BUILD_BVF_GATEWARE.tcl \"SCRIPT_ARGS: CAPE_DIR:$cape_dir PROJECT_LOCATION:$project_dir TOP_LEVEL_NAME:$TOP_LEVEL_NAME HSS_IMAGE_PATH:$hss_path PROG_EXPORT_PATH:$prog_path DESIGN_VERSION:$DESIGN_VERSION $only_do\""
+    echo $command
+    # For some reason, the command doesn't run correctly if we run it directly
+    python -c "import subprocess, sys; proc = subprocess.Popen('$command', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); [sys.stdout.write(line.decode('ascii')) for line in proc.stdout]"
+}
+
+clean_fpexpress_project() {
+    if [ -d "$BUILD_DIR/FlashProExpress" ]; then
+        echo "Cleaning FlashProExpress project"
+        rm -rf "$BUILD_DIR/FlashProExpress/$TOP_LEVEL_NAME/"
+    fi
+}
+
+fp_express_program() {
+    echo "================================================================================"
+    echo "                          Programming device"
+    echo "================================================================================"
+    local prog_path=$(correct_path "$BUILD_DIR")
+    cd $FPGA_DESIGN_DIR
+
+    command="FPExpress SCRIPT:PROGRAM_DEVICE.tcl \"SCRIPT_ARGS:TOP_LEVEL_NAME:$TOP_LEVEL_NAME PROG_EXPORT_PATH:$prog_path DEVICE:$DEVICE\""
     echo $command
     python -c "import subprocess, sys; proc = subprocess.Popen('$command', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); [sys.stdout.write(line.decode('ascii')) for line in proc.stdout]"
 }
@@ -198,6 +232,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -l|--full-synthesis-log)
             FULL_SYNTHESIS_LOG=1
+            shift
+            ;;
+        -r|--pnr-log)
+            PLACE_AND_ROUTE_LOG=1
             shift
             ;;
         --program-only)
@@ -268,12 +306,23 @@ check_tool_status
 #####################
 
 if [ $SYNTHESIS_ERRORS -eq 1 ]; then
-    grep -E "$@E:" $BUILD_DIR/libero/synthesis/DISPLAY_*.srr | less
+    grep -E "$@E:" $BUILD_DIR/libero/synthesis/*.srr | less
     exit 0
 fi
 
 if [ $FULL_SYNTHESIS_LOG -eq 1 ]; then
-    less $BUILD_DIR/libero/synthesis/DISPLAY_*.srr
+    less $BUILD_DIR/libero/synthesis/*.srr
+    exit 0
+fi
+
+if [ $PLACE_AND_ROUTE_LOG -eq 1 ]; then
+    less $BUILD_DIR/libero/designer/$TOP_LEVEL_NAME/*_layout_log.log
+    exit 0
+fi
+
+if [ $PROGRAM_ONLY -eq 1 ]; then
+    clean_fpexpress_project
+    fp_express_program
     exit 0
 fi
 
@@ -282,3 +331,14 @@ echo
 build_hss
 echo
 generate_libero_project
+
+if [ $PROGRAM -eq 1 ]; then
+    fp_express_program
+fi
+
+END_TIME=$(date +%s)
+ELAPSED=$((END_TIME - START_TIME))
+MINUTES=$((ELAPSED / 60))
+SECONDS=$((ELAPSED % 60))
+echo
+echo "Build completed in ${MINUTES}m ${SECONDS}s"

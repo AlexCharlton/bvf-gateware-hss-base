@@ -137,8 +137,8 @@ derive_constraints_sdc
 #
 file mkdir $prog_export_path
 file mkdir $fpe_export_path
-file mkdir $spi_export_path
-file mkdir $directc_export_path
+# file mkdir $spi_export_path
+# file mkdir $directc_export_path
 
 if !{[info exists ONLY_CREATE_DESIGN]} {
     run_tool -name {SYNTHESIZE}
@@ -149,11 +149,11 @@ if !{[info exists ONLY_CREATE_DESIGN]} {
             create_eNVM_config "$local_dir/script_support/components/MSS/ENVM.cfg" "$HSS_IMAGE_PATH"
             run_tool -name {GENERATEPROGRAMMINGDATA}
             configure_envm -cfg_file {script_support/components/MSS/ENVM.cfg}
-            source ./script_support/export_spi_prog_file.tcl
             configure_spiflash -cfg_file {./script_support/spiflash.cfg}
             run_tool -name {GENERATEPROGRAMMINGFILE}
-            #       run_tool -name {GENERATE_SPI_FLASH_IMAGE}
             source ./script_support/export_flashproexpress.tcl
+            # source ./script_support/export_spi_prog_file.tcl
+            # run_tool -name {GENERATE_SPI_FLASH_IMAGE}
             # source ./script_support/export_directc.tcl
         } else {
             run_tool -name {GENERATEPROGRAMMINGDATA}
