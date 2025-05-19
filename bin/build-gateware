@@ -167,14 +167,27 @@ generate_libero_project() {
     local hss_path=$(correct_path "$HSS_IMAGE_PATH")
     local prog_path=$(correct_path "$BUILD_DIR")
 
-    only_do=""
+    local only_do=""
     if [ $CREATE_ONLY -eq 1 ]; then
         only_do=" ONLY_CREATE_DESIGN:1"
     elif [ $SYNTHESIZE_ONLY -eq 1 ]; then
         only_do=" ONLY_SYNTHESIZE:1"
     fi
 
-    command="libero SCRIPT:BUILD_BVF_GATEWARE.tcl \"SCRIPT_ARGS: CAPE_DIR:$cape_dir PROJECT_LOCATION:$project_dir TOP_LEVEL_NAME:$TOP_LEVEL_NAME HSS_IMAGE_PATH:$hss_path PROG_EXPORT_PATH:$prog_path DESIGN_VERSION:$DESIGN_VERSION $only_do\""
+    local options_file="$cape_dir/OPTIONS"
+    local options=""
+    if [ -f "$options_file" ]; then
+        # Read each line and properly quote/escape the values
+        while IFS= read -r line || [ -n "$line" ]; do
+            # Skip empty lines
+            [ -z "$line" ] && continue
+            # Remove any trailing whitespace/carriage returns
+            line=$(echo "$line" | tr -d '\r')
+            options="$options $line"
+        done < "$options_file"
+    fi
+
+    local command="libero SCRIPT:BUILD_BVF_GATEWARE.tcl \"SCRIPT_ARGS:CAPE_DIR:$cape_dir PROJECT_LOCATION:$project_dir TOP_LEVEL_NAME:$TOP_LEVEL_NAME HSS_IMAGE_PATH:$hss_path PROG_EXPORT_PATH:$prog_path DESIGN_VERSION:$DESIGN_VERSION$only_do $options\""
     echo $command
     # For some reason, the command doesn't run correctly if we run it directly
     python -c "import subprocess, sys; proc = subprocess.Popen('$command', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); [sys.stdout.write(line.decode('ascii')) for line in proc.stdout]"
@@ -194,7 +207,7 @@ fp_express_program() {
     local prog_path=$(correct_path "$BUILD_DIR")
     cd $FPGA_DESIGN_DIR
 
-    command="FPExpress SCRIPT:PROGRAM_DEVICE.tcl \"SCRIPT_ARGS:TOP_LEVEL_NAME:$TOP_LEVEL_NAME PROG_EXPORT_PATH:$prog_path DEVICE:$DEVICE\""
+    local command="FPExpress SCRIPT:PROGRAM_DEVICE.tcl \"SCRIPT_ARGS:TOP_LEVEL_NAME:$TOP_LEVEL_NAME PROG_EXPORT_PATH:$prog_path DEVICE:$DEVICE\""
     echo $command
     python -c "import subprocess, sys; proc = subprocess.Popen('$command', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); [sys.stdout.write(line.decode('ascii')) for line in proc.stdout]"
 }

@@ -81,31 +81,31 @@ if {[info exists CAPE_DIR]} {
 }
 puts "Using cape at: $cape_dir"
 
-if {[info exists M2_OPTION]} {
-    set m2_option "$M2_OPTION"
+if {[info exists M2]} {
+    set m2_option "$M2"
 } else {
     set m2_option "NONE"
 }
-# puts "M.2 option selected: $m2_option"
+puts "M.2 option selected: $m2_option"
 
 
-if {[info exists SYZYGY_OPTION]} {
-    set syzygy_option "$SYZYGY_OPTION"
+if {[info exists SYZYGY]} {
+    set syzygy_option "$SYZYGY"
 } else {
-    if {[info exists HIGH_SPEED_CONN_OPTION]} {
-        set syzygy_option "$HIGH_SPEED_CONN_OPTION"
+    if {[info exists HIGH_SPEED_CONN]} {
+        set syzygy_option "$HIGH_SPEED_CONN"
     } else {
         set syzygy_option "NONE"
     }
 }
-# puts "SYZYGY high speed connector option option selected: $syzygy_option"
+puts "SYZYGY high speed connector option option selected: $syzygy_option"
 
-if {[info exists MIPI_CSI_OPTION]} {
-    set mipi_csi_option "$MIPI_CSI_OPTION"
+if {[info exists MIPI_CSI]} {
+    set mipi_csi_option "$MIPI_CSI"
 } else {
     set mipi_csi_option "NONE"
 }
-# puts "MIPI CSI option option selected: $mipi_csi_option"
+puts "MIPI CSI option option selected: $mipi_csi_option"
 
 if {[info exists PROJECT_LOCATION]} {
     set project_dir "$PROJECT_LOCATION"

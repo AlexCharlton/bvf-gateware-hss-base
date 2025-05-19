@@ -24,3 +24,25 @@ export PATH=$PATH:$LIBERO_INSTALL_DIR/Designer/bin:$LIBERO_INSTALL_DIR/Designer/
 
 Add the `bin` directory to your PATH.
 
+Now, run `build-gateware`, pointing at a cape directory. There are some example capes in the `gateware-examples` directory. Copy these to your project and modify as needed.
+
+## Capes
+Capes are expected to have the following directory structure:
+```
+<cape_dir>/
+    OPTIONS
+    ADD_CAPE.tcl
+    constraints/cape.pdc
+```
+
+The `OPTIONS` file is used to configure the cape.
+Valid options are:
+- `M2`: `NONE`, `DEFAULT`, `PCIE_ONLY`
+- `SYZYGY`: `NONE`, `DEFAULT`
+- `MIPI_CSI`: `NONE`, `DEFAULT`
+
+You can also add your own options, by adding directories to `FPGA-design/script_support/components/{M2,SYZYGY,MIPI_CSI}`.
+
+The `ADD_CAPE.tcl` file is used to add the cape to the gateware design.
+
+The `constraints/cape.pdc` file is used to add the cape constraints to the gateware design.
