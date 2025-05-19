@@ -85,7 +85,7 @@ import_files \
     -fp_pdc "${constraint_path}/NW_PLL.pdc" \
     -fp_pdc "./script_support/components/SYZYGY/$syzygy_option/constraints/fp/SYZYGY.pdc" \
     -sdc "${constraint_path}/fic_clocks.sdc" \
-    -io_pdc "./script_support/components/CAPE/$cape_option/constraints/cape.pdc" \
+    -io_pdc "$cape_dir/constraints/cape.pdc" \
     -io_pdc "./script_support/components/M2/$m2_option/constraints/M2.pdc" \
     -io_pdc "./script_support/components/SYZYGY/$syzygy_option/constraints/SYZYGY.pdc" \
     -io_pdc "./script_support/components/MIPI_CSI/$mipi_csi_option/constraints/MIPI_CSI_INTERFACE.pdc"

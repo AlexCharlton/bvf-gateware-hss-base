@@ -310,7 +310,7 @@ sd_mark_pins_unused -sd_name ${sd_name} -pin_names {BVF_RISCV_SUBSYSTEM:CAN_1_TX
 #-------------------------------------------------------------------------------
 
 source script_support/components/SYZYGY/$syzygy_option/ADD_HIGH_SPEED_CONNECTOR.tcl
-source script_support/components/CAPE/$cape_option/ADD_CAPE.tcl
+source $cape_dir/ADD_CAPE.tcl
 source script_support/components/M2/$m2_option/ADD_M2_INTERFACE.tcl
 source script_support/components/MIPI_CSI/$mipi_csi_option/ADD_MIPI_CSI_INTERFACE.tcl
 

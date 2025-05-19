@@ -9,7 +9,7 @@ $ git clone --recursive
 Configure HSS if desired. A default configuration is provided in the `hss.default-config` file, which will be used if no configuration is performed.
 ```sh
 $ cd hart-software-services
-$ make BOARD=bvf config
+$ make BOARD=mpfs-beaglev-fire config
 ```
 
 Install [Libero](https://www.microchip.com/en-us/products/fpgas-and-plds/fpga-and-soc-design-tools/fpga/libero-software-later-versions) and [SoftConsole](https://www.microchip.com/en-us/products/fpgas-and-plds/fpga-and-soc-design-tools/soc-fpga/softconsole), and make sure the `PATH`, `LM_LICENSE_FILE`, and `FPGENPROG` environment variables are set.

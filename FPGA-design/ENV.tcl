@@ -30,10 +30,13 @@ if { [lindex $tcl_platform(os) 0]  == "Windows" } {
 if { $::argc > 0 } {
     set i 1
     foreach arg $::argv {
-        if {[string match "*:*" $arg]} {
-            set temp [split $arg ":"]
-            puts "Setting parameter [lindex $temp 0] to [lindex $temp 1]"
-            set [lindex $temp 0] "[lindex $temp 1]"
+        # Split at first colon only
+        set idx [string first ":" $arg]
+        if {$idx != -1} {
+            set param [string range $arg 0 [expr {$idx-1}]]
+            set value [string range $arg [expr {$idx+1}] end]
+            puts "Setting parameter $param to $value"
+            set $param $value
         } else {
             set $arg 1
             puts "set $arg to 1"
@@ -71,12 +74,12 @@ if {[info exists TOP_LEVEL_NAME]} {
     set top_level_name BVF_GATEWARE
 }
 
-if {[info exists CAPE_OPTION]} {
-    set cape_option "$CAPE_OPTION"
+if {[info exists CAPE_DIR]} {
+    set cape_dir "$CAPE_DIR"
 } else {
-    set cape_option "DEFAULT"
+    error "Cape directory not set"
 }
-puts "Cape options selected: $cape_option"
+puts "Using cape at: $cape_dir"
 
 if {[info exists M2_OPTION]} {
     set m2_option "$M2_OPTION"
