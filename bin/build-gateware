@@ -1,4 +1,4 @@
-#!/bin/bash
+s!/bin/bash
 
 set -e
 
@@ -76,7 +76,7 @@ make_mss_config() {
     echo "                          Generating MSS configuration"
     echo "================================================================================"
     if [ -f "$MSS_CONFIG_XML" ]; then
-        echo "MSS configuration already exists"
+        echo "MSS configuration already exists, skipping"
         return
     fi
 
