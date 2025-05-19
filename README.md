@@ -1,5 +1,7 @@
 # BeagleV-Fire Gateware & HSS Base
 
+This is a modified version of the [BeagleV-Fire Gateware project](https://git.beagleboard.org/beaglev-fire/gateware), made to make it easier to describe the custom parts of a design separately from the core elements. Additional conveniences for building gateware (like automatic FPExpress programming) are also included. Bitstreams/device trees for Linux are have been omitted for simplicity.
+
 ## Usage
 Clone this repository, with submodules:
 ```sh
@@ -27,7 +29,8 @@ Add the `bin` directory to your PATH.
 Now, run `build-gateware`, pointing at a cape directory. There are some example capes in the `gateware-examples` directory. Copy these to your project and modify as needed.
 
 ## Capes
-Capes are expected to have the following directory structure:
+The custom parts of a gateware design are contained in a "Cape" directory (even though they don't necessarily have to relate to a Beagle board cape). Capes are expected to have the following directory structure:
+
 ```
 <cape_dir>/
     OPTIONS
@@ -41,7 +44,7 @@ Valid options are:
 - `SYZYGY`: `NONE`, `DEFAULT`
 - `MIPI_CSI`: `NONE`, `DEFAULT`
 
-You can also add your own options, by adding directories to `FPGA-design/script_support/components/{M2,SYZYGY,MIPI_CSI}`.
+You can also add your own options by adding directories to `FPGA-design/script_support/components/{M2,SYZYGY,MIPI_CSI}`.
 
 The `ADD_CAPE.tcl` file is used to add the cape to the gateware design.
 
