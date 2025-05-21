@@ -204,6 +204,7 @@ fp_express_program() {
     echo "================================================================================"
     echo "                          Programming device"
     echo "================================================================================"
+    clean_fpexpress_project
     local prog_path=$(correct_path "$BUILD_DIR")
     cd $FPGA_DESIGN_DIR
 
@@ -334,7 +335,6 @@ if [ $PLACE_AND_ROUTE_LOG -eq 1 ]; then
 fi
 
 if [ $PROGRAM_ONLY -eq 1 ]; then
-    clean_fpexpress_project
     fp_express_program
     exit 0
 fi
