@@ -13,6 +13,7 @@ CREATE_ONLY=0
 SYNTHESIZE_ONLY=0
 PROGRAM_ONLY=0
 SYNTHESIS_ERRORS=0
+SYNTHESIS_WARNINGS=0
 FULL_SYNTHESIS_LOG=0
 PLACE_AND_ROUTE_LOG=0
 
@@ -30,6 +31,7 @@ usage() {
     echo "  -c, --create-only         Only create the Libero design, skip the build"
     echo "  -s, --synthesize-only     Only synthesize the design, skip the build"
     echo "  -e, --synthesis-errors    Show synthesis errors from a previous build"
+    echo "  -w, --synthesis-warn      Show synthesis warnings from a previous build"
     echo "  -l, --full-synthesis-log  Show the full synthesis log"
     echo "  -r, --pnr-log             Show the place and route log"
     echo "  --program-only            Program the device only, skip the build"
@@ -244,6 +246,10 @@ while [[ $# -gt 0 ]]; do
             SYNTHESIS_ERRORS=1
             shift
             ;;
+        -w|--synthesis-warn)
+            SYNTHESIS_WARNINGS=1
+            shift
+            ;;
         -l|--full-synthesis-log)
             FULL_SYNTHESIS_LOG=1
             shift
@@ -320,7 +326,13 @@ check_tool_status
 #####################
 
 if [ $SYNTHESIS_ERRORS -eq 1 ]; then
-    grep -E "$@E:" $BUILD_DIR/libero/synthesis/*.srr | less
+    grep -E '^@E:' $BUILD_DIR/libero/synthesis/*.srr | less
+    exit 0
+fi
+
+if [ $SYNTHESIS_WARNINGS -eq 1 ]; then
+set -x
+    grep -E '^@W:' $BUILD_DIR/libero/synthesis/*.srr | less
     exit 0
 fi
 
