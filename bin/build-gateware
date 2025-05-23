@@ -191,8 +191,20 @@ generate_libero_project() {
 
     local command="libero SCRIPT:BUILD_BVF_GATEWARE.tcl \"SCRIPT_ARGS:CAPE_DIR:$cape_dir PROJECT_LOCATION:$project_dir TOP_LEVEL_NAME:$TOP_LEVEL_NAME HSS_IMAGE_PATH:$hss_path PROG_EXPORT_PATH:$prog_path DESIGN_VERSION:$DESIGN_VERSION$only_do $options\""
     echo $command
+    # Run command and check for error string in output
     # For some reason, the command doesn't run correctly if we run it directly
-    python -c "import subprocess, sys; proc = subprocess.Popen('$command', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT); [sys.stdout.write(line.decode('ascii')) for line in proc.stdout]"
+    python -c "
+import subprocess, sys
+proc = subprocess.Popen('$command', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+error_found = False
+for line in proc.stdout:
+    line_text = line.decode('ascii')
+    sys.stdout.write(line_text)
+    if 'Error:  The Execute Script command failed.' in line_text:
+        error_found = True
+proc.wait()
+sys.exit(1 if error_found or proc.returncode != 0 else 0)
+"
 }
 
 clean_fpexpress_project() {
