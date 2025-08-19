@@ -28,6 +28,7 @@ usage() {
     echo "Options:"
     echo "  -f, --force-hss           Force the build of the HSS"
     echo "  -p, --program             Program the FPGA/bootloader after building"
+    echo "  -b, --bitstream-only      Only generate the bitstream, reusing the previous gateware build. Can be used with --force-hss and --program"
     echo "  -c, --create-only         Only create the Libero design, skip the build"
     echo "  -s, --synthesize-only     Only synthesize the design, skip the build"
     echo "  -e, --synthesis-errors    Show synthesis errors from a previous build"
@@ -207,6 +208,39 @@ sys.exit(1 if error_found or proc.returncode != 0 else 0)
 "
 }
 
+generate_bitstream() {
+    echo "================================================================================"
+    echo "                          Generating bitstream"
+    echo "================================================================================"
+
+    DESIGN_VERSION=$(get_design_version)
+    echo "Design version: $DESIGN_VERSION"
+    echo "Top level name: $TOP_LEVEL_NAME"
+    cd $FPGA_DESIGN_DIR
+
+    local cape_dir=$(correct_path "$GATEWARE_DIR")
+    local project_dir=$(correct_path "$LIBERO_BUILD_DIR")
+    local hss_path=$(correct_path "$HSS_IMAGE_PATH")
+    local prog_path=$(correct_path "$BUILD_DIR")
+
+    local command="libero SCRIPT:GENERATE_BITSTREAM.tcl \"SCRIPT_ARGS:CAPE_DIR:$cape_dir PROJECT_LOCATION:$project_dir TOP_LEVEL_NAME:$TOP_LEVEL_NAME HSS_IMAGE_PATH:$hss_path PROG_EXPORT_PATH:$prog_path DESIGN_VERSION:$DESIGN_VERSION\""
+    echo $command
+    # Run command and check for error string in output
+    # For some reason, the command doesn't run correctly if we run it directly
+    python -c "
+import subprocess, sys
+proc = subprocess.Popen('$command', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+error_found = False
+for line in proc.stdout:
+    line_text = line.decode('ascii')
+    sys.stdout.write(line_text)
+    if 'Error:  The Execute Script command failed.' in line_text:
+        error_found = True
+proc.wait()
+sys.exit(1 if error_found or proc.returncode != 0 else 0)
+"
+}
+
 clean_fpexpress_project() {
     if [ -d "$BUILD_DIR/FlashProExpress" ]; then
         echo "Cleaning FlashProExpress project"
@@ -363,11 +397,17 @@ if [ $PROGRAM_ONLY -eq 1 ]; then
     exit 0
 fi
 
-make_mss_config
-echo
-build_hss
-echo
-generate_libero_project
+if [ $BITSTREAM_ONLY -eq 1 ]; then
+    build_hss
+    echo
+    generate_bitstream
+else
+    make_mss_config
+    echo
+    build_hss
+    echo
+    generate_libero_project
+fi
 
 if [ $PROGRAM -eq 1 ]; then
     fp_express_program
